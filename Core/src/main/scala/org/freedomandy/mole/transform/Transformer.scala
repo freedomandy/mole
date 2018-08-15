@@ -11,14 +11,7 @@ import org.freedomandy.mole.commons.utils.PluginLoader
   */
 case class Transformer(session: SparkSession, config: Config) {
   import collection.JavaConversions._
-  val keyFields: Set[String] = config.getString("mole.source.key").split(",").toSet
-  val timeField: Option[(String, String, String)] =
-    if (config.getIsNull("mole.transform.time"))
-      None
-    else
-      Some((config.getString("mole.transform.time.field"),
-        config.getString("mole.transform.time.format"),
-        config.getString("mole.transform.time.outputName")))
+
   val actionList: List[Config] = config.getObjectList("mole.transform.flow").toList.map(_.toConfig)
 
   def loadPlugins(): Function[Config, DataFrame => DataFrame] = {
@@ -38,6 +31,10 @@ case class Transformer(session: SparkSession, config: Config) {
           Group.transform(config)
         case config: Config if config.getString("action") == CustomUDFGenerator.actionName =>
           CustomUDFGenerator.transform(config)
+        case config: Config if config.getString("action") == KeyGenerator.actionName =>
+          KeyGenerator.transform(config)
+        case config: Config if config.getString("action") == TimeFormatter.actionName =>
+          TimeFormatter.transform(config)
       }
       val finalPF =
         if (customTransform.isDefined)
@@ -67,13 +64,7 @@ case class Transformer(session: SparkSession, config: Config) {
   }
 
   def run(dataFrame: DataFrame): DataFrame = {
-    val dfWithKeyAndTime =
-      if (timeField.isEmpty)
-        Common.addIdField(dataFrame, keyFields)
-      else
-        Common.addTimeField(Common.addIdField(dataFrame, keyFields), timeField.get._1, timeField.get._2, timeField.get._3)
-
-    transform(dfWithKeyAndTime)
+    transform(dataFrame)
   }
 }
 

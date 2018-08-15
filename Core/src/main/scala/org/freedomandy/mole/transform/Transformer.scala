@@ -11,15 +11,15 @@ import org.freedomandy.mole.commons.utils.PluginLoader
   */
 case class Transformer(session: SparkSession, config: Config) {
   import collection.JavaConversions._
-  val keyFields: Set[String] = config.getString("synchronize.source.key").split(",").toSet
+  val keyFields: Set[String] = config.getString("mole.source.key").split(",").toSet
   val timeField: Option[(String, String, String)] =
-    if (config.getIsNull("synchronize.transform.time"))
+    if (config.getIsNull("mole.transform.time"))
       None
     else
-      Some((config.getString("synchronize.transform.time.field"),
-        config.getString("synchronize.transform.time.format"),
-        config.getString("synchronize.transform.time.outputName")))
-  val actionList: List[Config] = config.getObjectList("synchronize.transform.flow").toList.map(_.toConfig)
+      Some((config.getString("mole.transform.time.field"),
+        config.getString("mole.transform.time.format"),
+        config.getString("mole.transform.time.outputName")))
+  val actionList: List[Config] = config.getObjectList("mole.transform.flow").toList.map(_.toConfig)
 
   def loadPlugins(): Function[Config, DataFrame => DataFrame] = {
     def getPartialFunction(flowStage: FlowStage): PartialFunction[Config, DataFrame => DataFrame] = {

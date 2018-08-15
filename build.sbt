@@ -12,18 +12,15 @@ lazy val commonSettings = Seq(
 
 lazy val common = (project in file("Common"))
   .settings(
-    commonSettings//,
-    // other settings
+    commonSettings
   )
 
 lazy val plugings = (project in file("Plugins_Example")).dependsOn(common)
   .settings(
-    commonSettings//,
-    // other settings
+    commonSettings
   )
 
 lazy val core = (project in file("Core")).dependsOn(common).dependsOn(plugings)
   .settings(
-    commonSettings//,
-    // other settings
+    commonSettings
   )

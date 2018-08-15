@@ -1,22 +1,21 @@
-package org.freedomandy.mole.synchronizers
-
+package org.freedomandy.mole.testplugin.sinks
 import com.mongodb.client.MongoCollection
-import com.mongodb.spark.config.{ReadConfig, WriteConfig}
 import com.mongodb.spark.{MongoConnector, MongoSpark}
+import com.mongodb.spark.config.{ReadConfig, WriteConfig}
 import com.typesafe.config.Config
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.freedomandy.mole.commons.synchronizers.Synchronizer
+import org.freedomandy.mole.commons.sinks.Sink
 
 /**
-  * @author Andy Huang on 27/03/2018
+  * @author Andy Huang on 2018/6/4
   */
-object MongoSynchronizer extends Synchronizer {
+class TestSink extends Sink {
   private val MONGO_CONFIG_PATH = "path"
 
-  override def sinkName: String = "MONGODB"
+  override def sinkName: String = "TEST_SINK"
 
-  override def sync(config: Config)( dataFrame: DataFrame, keyField: String): Unit = {
+  override def overwrite(config: Config)(dataFrame: DataFrame, keyField: String): Unit = {
     val session = SparkSession.builder.appName("MOLE Job").getOrCreate()
     val sc = session.sparkContext
     val sparkIdSet = dataFrame.select(keyField).rdd.map(_.getString(0))
@@ -34,7 +33,7 @@ object MongoSynchronizer extends Synchronizer {
     deleteData(config)(deletedSet, keyField)
 
     // Upsert spark data
-    upsertData(config)(dataFrame, keyField)
+    upsert(config)(dataFrame, keyField)
 
   }
 
@@ -62,7 +61,7 @@ object MongoSynchronizer extends Synchronizer {
     }
   }
 
-  override def upsertData(config: Config)(upsertDF: DataFrame, keyField: String): Unit = {
+  override def upsert(config: Config)(upsertDF: DataFrame, keyField: String): Unit = {
     val writeConfig = WriteConfig(Map("uri" -> config.getString(MONGO_CONFIG_PATH), "writeConcern.w" -> "majority"))
 
     try {

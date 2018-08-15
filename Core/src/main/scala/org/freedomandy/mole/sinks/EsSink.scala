@@ -1,23 +1,23 @@
-package org.freedomandy.mole.synchronizers
+package org.freedomandy.mole.sinks
 
 import com.typesafe.config.Config
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.elasticsearch.spark._
 import org.elasticsearch.spark.sql._
-import org.freedomandy.mole.commons.synchronizers.Synchronizer
+import org.freedomandy.mole.commons.sinks.Sink
 import org.freedomandy.mole.commons.utils.ApacheHttpClient
 
 /**
   * @author Andy Huang on 26/03/2018
   */
-object EsSynchronizer extends Synchronizer {
+object EsSink extends Sink {
   private val URL_CONFIG_PATH = "url"
   private val RESOURCE_CONFIG_PATH = "resource"
 
   override def sinkName: String = "ELASTIC_SEARCH"
 
-  override def sync(config: Config)(dataFrame: DataFrame, keyField: String): Unit = {
+  override def overwrite(config: Config)(dataFrame: DataFrame, keyField: String): Unit = {
     val session = SparkSession.builder.appName("MOLE Job").getOrCreate()
     val sc = session.sparkContext
     val sparkIdSet = dataFrame.select(keyField).rdd.map(_.getString(0))
@@ -34,7 +34,7 @@ object EsSynchronizer extends Synchronizer {
     deleteData(config)(deletedSet, keyField)
 
     // Upsert spark data
-    upsertData(config)(dataFrame, keyField)
+    upsert(config)(dataFrame, keyField)
   }
 
   override def deleteData(config: Config)(deletedSet: RDD[String], keyField: String): Unit = {
@@ -65,7 +65,7 @@ object EsSynchronizer extends Synchronizer {
 
   }
 
-  override def upsertData(config: Config)(upsertDF: DataFrame, keyField: String): Unit = {
+  override def upsert(config: Config)(upsertDF: DataFrame, keyField: String): Unit = {
     val resource = config.getString(RESOURCE_CONFIG_PATH)
     val url = config.getString(URL_CONFIG_PATH)
 

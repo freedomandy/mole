@@ -6,7 +6,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 /**
   * @author Andy Huang on 2018/6/1
   */
-trait SourceBehaviors {
+trait Source {
   def sourceName: String
 
   def get(session: SparkSession, config: Config): Option[DataFrame]

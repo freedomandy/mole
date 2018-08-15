@@ -3,18 +3,18 @@ package org.freedomandy.mole.commons.utils
 import com.typesafe.config.Config
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.freedomandy.mole.commons.sources.SourceBehaviors
-import org.freedomandy.mole.commons.synchronizers.Synchronizer
+import org.freedomandy.mole.commons.sources.Source
+import org.freedomandy.mole.commons.sinks.Sink
 import org.freedomandy.mole.commons.transform.FlowStage
 
 /**
   * @author Andy Huang on 2018/5/30
   */
 object PluginLoader {
-  def loadSourcePlugins(config: Config): List[SourceBehaviors] = {
-    def loadSourceInstance(path: String): SourceBehaviors = {
-      new SourceBehaviors with Serializable {
-        lazy val sourceBehaviors: SourceBehaviors = Class.forName(path).newInstance().asInstanceOf[SourceBehaviors]
+  def loadSourcePlugins(config: Config): List[Source] = {
+    def loadSourceInstance(path: String): Source = {
+      new Source with Serializable {
+        lazy val sourceBehaviors: Source = Class.forName(path).newInstance().asInstanceOf[Source]
 
         override val sourceName: String = sourceBehaviors.sourceName
 
@@ -48,21 +48,21 @@ object PluginLoader {
     } else Nil
   }
 
-  def loadSinkPlugins(config: Config): List[Synchronizer] = {
-    def loadSinkInstance(path: String): Synchronizer = {
-      new Synchronizer with Serializable {
-        lazy val synchronizer: Synchronizer = Class.forName(path).newInstance().asInstanceOf[Synchronizer]
+  def loadSinkPlugins(config: Config): List[Sink] = {
+    def loadSinkInstance(path: String): Sink = {
+      new Sink with Serializable {
+        lazy val synchronizer: Sink = Class.forName(path).newInstance().asInstanceOf[Sink]
 
         override def sinkName: String = synchronizer.sinkName
 
         override def deleteData(config: Config)(deletedSet: RDD[String], keyField: String): Unit =
           synchronizer.deleteData(config)(deletedSet, keyField)
 
-        override def upsertData(config: Config)(upsertDF: DataFrame, keyField: String): Unit =
-          synchronizer.upsertData(config)(upsertDF, keyField)
+        override def upsert(config: Config)(upsertDF: DataFrame, keyField: String): Unit =
+          synchronizer.upsert(config)(upsertDF, keyField)
 
-        override def sync(config: Config)(dataFrame: DataFrame, keyField: String): Unit =
-          synchronizer.sync(config)(dataFrame, keyField)
+        override def overwrite(config: Config)(dataFrame: DataFrame, keyField: String): Unit =
+          synchronizer.overwrite(config)(dataFrame, keyField)
       }
     }
 

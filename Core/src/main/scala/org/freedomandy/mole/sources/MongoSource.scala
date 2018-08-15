@@ -4,12 +4,12 @@ import com.mongodb.spark.MongoSpark
 import com.mongodb.spark.config.ReadConfig
 import com.typesafe.config.Config
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.freedomandy.mole.commons.sources.SourceBehaviors
+import org.freedomandy.mole.commons.sources.Source
 
 /**
   * @author Andy Huang on 2018/6/1
   */
-object MongoSource extends SourceBehaviors {
+object MongoSource extends Source {
   override def sourceName: String = "MONGODB"
 
   override def get(session: SparkSession, config: Config): Option[DataFrame] = {

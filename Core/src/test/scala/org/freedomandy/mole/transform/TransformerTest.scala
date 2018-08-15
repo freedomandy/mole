@@ -25,7 +25,7 @@ class TransformerTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |plugins {
           |  transform = ["org.freedomandy.mole.testplugin.transform.TestStage"]
           |}
-          |synchronize {
+          |mole {
           |  source {
           |    type = "HIVE"
           |    query = "SELECT * FROM whatever"
@@ -76,7 +76,7 @@ class TransformerTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
     it("transform no available plugin") {
       val configString =
         """
-          |synchronize {
+          |mole {
           |  source {
           |    query = "SELECT * FROM whatever"
           |    key = "anykey"

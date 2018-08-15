@@ -4,7 +4,7 @@ import com.typesafe.config.ConfigFactory
 import org.apache.spark.sql.SparkSession
 import org.freedomandy.mole.commons.exceptions.InvalidInputException
 import org.freedomandy.mole.sources.Extractor
-import org.freedomandy.mole.synchronizers.Loader
+import org.freedomandy.mole.sinks.Loader
 import org.freedomandy.mole.transform.Transformer
 
 /**

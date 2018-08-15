@@ -1,20 +1,20 @@
-package org.freedomandy.mole.synchronizers
+package org.freedomandy.mole.sinks
 
 import com.typesafe.config.Config
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.freedomandy.mole.commons.synchronizers.Synchronizer
+import org.freedomandy.mole.commons.sinks.Sink
 
 /**
   * @author Andy Huang on 29/03/2018
   */
-object HiveSynchronizer extends Synchronizer {
+object HiveSink extends Sink {
   private val DATABASE_CONFIG_PATH = "database"
   private val TABLE_CONFIG_PATH = "table"
 
   override def sinkName: String = "HIVE"
 
-  override def upsertData(config: Config)(upsertDF: DataFrame, keyField: String): Unit = {
+  override def upsert(config: Config)(upsertDF: DataFrame, keyField: String): Unit = {
     val database = config.getString(DATABASE_CONFIG_PATH)
     val table = config.getString(TABLE_CONFIG_PATH)
     val session = SparkSession.builder.appName("MOLE Job").getOrCreate()
@@ -47,7 +47,7 @@ object HiveSynchronizer extends Synchronizer {
     saveToHive(resultDF, database, table)
   }
 
-  override def sync(config: Config)(dataFrame: DataFrame, keyField: String): Unit = {
+  override def overwrite(config: Config)(dataFrame: DataFrame, keyField: String): Unit = {
     val database = config.getString(DATABASE_CONFIG_PATH)
     val table = config.getString(TABLE_CONFIG_PATH)
 

@@ -47,7 +47,7 @@ class PluginLoaderTest extends Matchers with FunSpecLike with BeforeAndAfterAll 
         |plugins {
         |  source = ["org.freedomandy.mole.testplugin.sources.TestSource"]
         |}
-        |synchronize {
+        |mole {
         |  source {
         |    type = "WEBHOOK"
         |  }
@@ -88,9 +88,9 @@ class PluginLoaderTest extends Matchers with FunSpecLike with BeforeAndAfterAll 
     val configString =
       """
         |plugins {
-        |  sink = ["org.freedomandy.mole.testplugin.synchronizers.TestSynchronizer"]
+        |  sink = ["org.freedomandy.mole.testplugin.sinks.TestSink"]
         |}
-        |synchronize {
+        |mole {
         |  sink: [
         |    {
         |      type = "TEST_SINK"
@@ -101,14 +101,14 @@ class PluginLoaderTest extends Matchers with FunSpecLike with BeforeAndAfterAll 
       """.stripMargin
     val config = ConfigFactory.parseString(configString)
     val sinkList = PluginLoader.loadSinkPlugins(config)
-    val sinkConfig = config.getObjectList("synchronize.sink").get(0).toConfig
+    val sinkConfig = config.getObjectList("mole.sink").get(0).toConfig
     val df = session.createDataFrame(Seq(("Y1", 1000, "c", "james", "b", Some(0.2), 1L),
       ("Y2", 200, "c", "james", "b", None, 1L),
       ("Y3", 100, "b", "james", "b", None, 2L),
       ("Y4", 100, "c", "Andy", "b", Some(5.0), 3L),
       ("Y5", 99, "c", "james", "b", None, 4L)))
 
-    sinkList.head.sync(sinkConfig)(df, "_1")
+    sinkList.head.overwrite(sinkConfig)(df, "_1")
 
 
     assert(getNumberOfStoredData(session) == 5)

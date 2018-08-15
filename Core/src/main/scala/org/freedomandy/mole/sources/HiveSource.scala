@@ -2,12 +2,12 @@ package org.freedomandy.mole.sources
 
 import com.typesafe.config.Config
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.freedomandy.mole.commons.sources.SourceBehaviors
+import org.freedomandy.mole.commons.sources.Source
 
 /**
   * @author Andy Huang on 2018/6/1
   */
-object HiveSource extends SourceBehaviors {
+object HiveSource extends Source {
   override def sourceName: String = "HIVE"
 
   override def get(session: SparkSession, config: Config): Option[DataFrame] = {

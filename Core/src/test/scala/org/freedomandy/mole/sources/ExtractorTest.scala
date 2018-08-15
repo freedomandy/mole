@@ -13,7 +13,7 @@ class ExtractorTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
       val session = SparkSession.builder.appName("MOLE Job").master("local[*]").getOrCreate()
       val configString =
         """
-          |synchronize {
+          |mole {
           |  source {
           |    type = "MONGODB"
           |    path = "mongodb://127.0.0.1:27017/test.test"

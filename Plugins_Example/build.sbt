@@ -9,7 +9,7 @@ libraryDependencies ++= {
   Seq(
     "org.apache.spark" % "spark-core_2.11" % sparkVersion % "provided",
     "org.apache.spark" %% "spark-sql" % sparkVersion,
-    "org.mongodb.spark" % "mongo-spark-connector_2.11" % "2.0.0",
+    "org.mongodb.spark" % "mongo-spark-connector_2.11" % "2.1.2",
     "com.typesafe" % "config" % "1.3.0",
     "org.scalatest" %% "scalatest" % "3.0.1"
   )

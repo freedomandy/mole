@@ -17,14 +17,26 @@ case class Loader(session: SparkSession, config: Config) {
     def getPartialFunction(synchronizer: Sink): PartialFunction[Config, (DataFrame, String) => Unit] = {
       case config: Config => synchronizer.overwrite(config)
     }
-    def getTransformFunc(customTransform: Option[PartialFunction[Config, (DataFrame, String) => Unit]]): Function[Config, (DataFrame, String)=> Unit] = {
+    def getSynchronizeFunc(customTransform: Option[PartialFunction[Config, (DataFrame, String) => Unit]]): Function[Config, (DataFrame, String)=> Unit] = {
+      def getOperation(config: Config, sink: Sink): (DataFrame, String) => Unit = {
+        if (config.getString("operation") == "OVERWRITE")
+          sink.overwrite(config)
+        else if (config.getString("operation") == "UPSERT")
+          sink.upsert(config)
+        else
+          throw new InvalidInputException("Unsupported sink operation")
+      }
+
       val basePF: PartialFunction[Config, (DataFrame, String) => Unit] = {
         case config: Config if config.getString("type") == EsSink.sinkName =>
-          EsSink.overwrite(config)
+          getOperation(config, EsSink)
         case config: Config if config.getString("type") == MongoSink.sinkName =>
-          MongoSink.overwrite(config)
+          getOperation(config, MongoSink)
         case config: Config if config.getString("type") == HiveSink.sinkName =>
-          HiveSink.overwrite(config)
+          if (config.getString("operation") == "APPEND")
+            HiveSink.append(config)
+          else
+            getOperation(config, HiveSink)
       }
 
       val finalPF =
@@ -41,13 +53,18 @@ case class Loader(session: SparkSession, config: Config) {
     val sinkPlugins = PluginLoader.loadSinkPlugins(config).map(getPartialFunction)
 
     if (sinkPlugins.isEmpty)
-      getTransformFunc(None)
+      getSynchronizeFunc(None)
     else
-      getTransformFunc(Some(sinkPlugins.reduce(_ orElse _)))
+      getSynchronizeFunc(Some(sinkPlugins.reduce(_ orElse _)))
   }
 
-  def run(dataFrame: DataFrame, keyField: String): Unit = {
+  def run(dataFrame: DataFrame): Unit = {
     val matchRules = loadPlugins()
+
+    val keyField =
+      if (config.hasPath("mole.sink.primaryKey"))
+        config.getString("mole.sink.primaryKey")
+      else "_id"
 
     sinkList.map(config => matchRules(config)).foreach(func => {
       try {

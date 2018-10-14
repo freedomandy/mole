@@ -6,3 +6,4 @@ out
 *.log
 target
 *.DS_Store
+spark-warehouse

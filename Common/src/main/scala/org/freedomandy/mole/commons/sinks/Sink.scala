@@ -12,7 +12,7 @@ trait Sink {
 
   def overwrite(config: Config)(dataFrame: DataFrame, keyField: String): Unit
 
-  def upsert(config: Config)(upsertDF: DataFrame, keyField: String): Unit
-
   def deleteData(config: Config)(deletedSet: RDD[String], keyField: String): Unit
+
+  def upsert(config: Config)(upsertDF: DataFrame, keyField: String): Unit
 }

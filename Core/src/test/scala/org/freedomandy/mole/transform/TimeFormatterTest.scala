@@ -1,7 +1,8 @@
 package org.freedomandy.mole.transform
 
 import java.sql.Date
-import com.typesafe.config.{ConfigFactory}
+
+import com.typesafe.config.{ConfigBeanFactory, ConfigFactory}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.scalatest.{BeforeAndAfterAll, FunSpecLike, Matchers}
 
@@ -9,7 +10,11 @@ import org.scalatest.{BeforeAndAfterAll, FunSpecLike, Matchers}
   * @author Andy Huang on 2018/7/31
   */
 class TimeFormatterTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
-val session: SparkSession = SparkSession.builder.config("spark.sql.warehouse.dir", "./spark-warehouse").appName("Test").master("local[*]").getOrCreate()
+//  def getTimeStamp(time; String) = {
+//
+//  }
+
+  val session: SparkSession = SparkSession.builder.config("spark.sql.warehouse.dir", "./spark-warehouse").appName("Test").master("local[*]").getOrCreate()
   val date = new java.util.Date
   val df: DataFrame = session.createDataFrame(Seq(
     ("Y1", 1000, Date.valueOf("2018-12-01"), Date.valueOf("2018-12-01").getTime / 1000, java.math.BigDecimal.valueOf(0.19999)),
@@ -48,4 +53,3 @@ val session: SparkSession = SparkSession.builder.config("spark.sql.warehouse.dir
   }
 
 }
-

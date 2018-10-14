@@ -29,7 +29,6 @@ class TransformerTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |  source {
           |    type = "HIVE"
           |    query = "SELECT * FROM whatever"
-          |    key = "anykey"
           |  }
           |  sink: [
           |   {
@@ -37,7 +36,6 @@ class TransformerTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |   }
           |  ]
           |  transform {
-          |    time =  null
           |    flow: [
           |      {
           |        action = "FieldMapping"
@@ -85,7 +83,6 @@ class TransformerTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |    anySink = "fakepath"
           |  }
           |  transform {
-          |    time =  null
           |    flow: [
           |      {
           |        action = "FieldMapping"

@@ -33,6 +33,8 @@ case class Transformer(session: SparkSession, config: Config) {
           CustomUDFGenerator.transform(config)
         case config: Config if config.getString("action") == KeyGenerator.actionName =>
           KeyGenerator.transform(config)
+        case config: Config if config.getString("action") == QueryExecutor.actionName =>
+          QueryExecutor.transform(config)
         case config: Config if config.getString("action") == TimeFormatter.actionName =>
           TimeFormatter.transform(config)
       }

@@ -20,6 +20,8 @@ case class Extractor(session: SparkSession, config: Config) {
           HiveSource.get(session, sourceConfig)
         case s: String if s == MongoSource.sourceName =>
           MongoSource.get(session, sourceConfig)
+        case s: String if s == JDBCSource.sourceName =>
+          JDBCSource.get(session, sourceConfig)
       }
       val finalPF =
         if (customSource.isDefined)

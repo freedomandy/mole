@@ -1,7 +1,7 @@
 package org.freedomandy.mole.commons.utils
 
 import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.{CloseableHttpResponse, HttpDelete, HttpGet, HttpPost}
+import org.apache.http.client.methods._
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.impl.client.{BasicResponseHandler, CloseableHttpClient, HttpClients}
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
@@ -72,7 +72,28 @@ class ApacheHttpClient extends HttpClient {
     }
   }
 
-  def update(url: String, headers: Map[String, String], body: String): String = ???
+  def update(url: String, headers: Map[String, String], body: String): String = {
+    val put = new HttpPut(url)
+
+    headers.foreach(pair => put.addHeader(pair._1, pair._2))
+    try {
+      put.setEntity(new ByteArrayEntity(body.getBytes("UTF-8")))
+      val response: CloseableHttpResponse = client.execute(put)
+      val statusCode: Int = response.getStatusLine.getStatusCode
+      val entity = response.getEntity
+      val result = if (entity == null) "" else EntityUtils.toString(entity)
+      response.close()
+
+      if (statusCode > 202) {
+        throw new BaseException(s"Failed to get response status: $statusCode , response: ${result.toString}")
+      } else {
+        result
+      }
+    } catch {
+      case e: Throwable =>
+        throw BaseException(s"Failed to send http request: ${e.toString}")
+    }
+  }
 
   def delete(url: String, headers: Map[String, String], body: String): String = {
     val delete = new HttpDelete(url)
@@ -94,6 +115,28 @@ class ApacheHttpClient extends HttpClient {
     } catch {
       case e: Throwable =>
         throw BaseException(s"Failed to send http request: ${e.toString}")
+    }
+  }
+
+  def request(httpMethod: String, url: String, headers: Map[String, String], body: Option[String]): Unit = {
+    httpMethod match {
+      case "GET" =>
+        get(url, headers)
+      case "DELETE" =>
+        if (body.isEmpty)
+          delete(url, headers, "")
+        else
+          delete(url, headers, body.get)
+      case "PUT" =>
+        if (body.isEmpty)
+          update(url, headers, "")
+        else
+          update(url, headers, body.get)
+      case "POST" =>
+        if (body.isEmpty)
+          post(url, headers, "")
+        else
+          post(url, headers, body.get)
     }
   }
 }

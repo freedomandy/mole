@@ -31,7 +31,7 @@ object EsSink extends Sink {
     }
 
     // Delete useless records
-    deleteData(config)(deletedSet, keyField)
+    deleteData(config)(deletedSet, "_id")
 
     // Upsert spark data
     upsert(config)(dataFrame, keyField)
@@ -73,6 +73,7 @@ object EsSink extends Sink {
       "es.index.auto.create" -> "true"))
   }
 
+  @Deprecated
   def getData(config: Config, session: SparkSession) = {
     val resource = config.getString(RESOURCE_CONFIG_PATH)
     val url = config.getString(URL_CONFIG_PATH)

@@ -1,27 +1,42 @@
 package org.freedomandy.mole
 
-import com.typesafe.config.ConfigFactory
-import org.apache.spark.sql.SparkSession
-import org.freedomandy.mole.commons.exceptions.InvalidInputException
-import org.freedomandy.mole.sources.Extractor
-import org.freedomandy.mole.sinks.Loader
-import org.freedomandy.mole.transform.Transformer
+import org.freedomandy.mole.commons.exceptions.{InvalidInputException, UnsatisfiedPropException}
+import org.freedomandy.mole.monitor.Monitor
+import org.freedomandy.mole.postworks.PostWorkHandler
 
 /**
   * @author Andy Huang on 2018/6/1
   */
 object Boot {
   def main(args: Array[String]) {
-    val config = ConfigFactory.load()
-    val session = SparkSession.builder.enableHiveSupport().appName("MOLE Job").getOrCreate()
-    val extractor = Extractor(session, config)
-    val transformer: Transformer = Transformer(session, config)
-    val loader = Loader(session, config)
-    val dfOp = extractor.run()
+    val startTime = System.currentTimeMillis / 1000
 
-    if (dfOp.isEmpty)
-      throw new InvalidInputException("Failed to load source data frame")
+    val result =
+      if (Module.createIfNotExist().getConfig.hasPath("mole.monitor")) {
+        val result = Monitor(Module.createIfNotExist()).handle(Module.createIfNotExist().getConfig.getConfig("mole.monitor"))
 
-    loader.run(transformer.run(dfOp.get), "_id")
+        if (result.isDefined) {
+          Module.createIfNotExist().loader.run(result.get)
+          result.get
+        } else {
+          throw new UnsatisfiedPropException("Failed to pass the verification process")
+        }
+      } else {
+        val extractor = Module.createIfNotExist().extractor
+        val transformer = Module.createIfNotExist().transformer
+        val loader = Module.createIfNotExist().loader
+        val dfOp = extractor.run()
+
+        if (dfOp.isEmpty)
+          throw new InvalidInputException("Failed to load source data frame")
+
+        val resultDF = transformer.run(dfOp.get)
+
+        loader.run(resultDF)
+        resultDF
+      }
+
+    // TODO: trigger post work
+    PostWorkHandler(Module.createIfNotExist().getSession, Module.createIfNotExist().getConfig).run(result, startTime)
   }
 }

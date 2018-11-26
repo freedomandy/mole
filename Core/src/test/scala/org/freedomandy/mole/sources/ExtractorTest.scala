@@ -17,7 +17,6 @@ class ExtractorTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |  source {
           |    type = "MONGODB"
           |    path = "mongodb://127.0.0.1:27017/test.test"
-          |    key = "_id"
           |  }
           |}
         """.stripMargin

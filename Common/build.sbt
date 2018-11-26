@@ -10,6 +10,7 @@ libraryDependencies ++= {
     "com.typesafe" % "config" % "1.3.0",
     "org.scalatest" %% "scalatest" % "3.0.1",
     "org.apache.spark" %% "spark-sql" % sparkVersion,
-    "org.apache.httpcomponents" % "httpclient" % "4.5.2"
+    "org.apache.httpcomponents" % "httpclient" % "4.5.2",
+    "org.apache.kafka" % "kafka-clients" % "0.9.0.1"
   )
 }

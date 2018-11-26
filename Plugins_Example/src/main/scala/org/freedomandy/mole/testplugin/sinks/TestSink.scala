@@ -1,4 +1,5 @@
 package org.freedomandy.mole.testplugin.sinks
+
 import com.mongodb.client.MongoCollection
 import com.mongodb.spark.{MongoConnector, MongoSpark}
 import com.mongodb.spark.config.{ReadConfig, WriteConfig}

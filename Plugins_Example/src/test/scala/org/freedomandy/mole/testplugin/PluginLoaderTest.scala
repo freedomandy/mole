@@ -59,7 +59,7 @@ class PluginLoaderTest extends Matchers with FunSpecLike with BeforeAndAfterAll 
     assert(sourceList.head.get(session, config).get.count() == 1)
   }
 
-  it ("Test for sink plugin") {
+  ignore ("Test for sink plugin") {
     def getNumberOfStoredData(session: SparkSession): Long = {
 
       val readConfig = ReadConfig(Map("uri" -> "mongodb://127.0.0.1:27017/test.test_result", "readPreference.name" -> "secondaryPreferred"))

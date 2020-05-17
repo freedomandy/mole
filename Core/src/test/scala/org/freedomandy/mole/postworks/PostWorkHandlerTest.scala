@@ -25,7 +25,7 @@ class PostWorkHandlerTest extends Matchers with FunSpecLike with BeforeAndAfterA
   }
 
   describe("Integration Test") {
-    it("usage") {
+    ignore("usage") {
       val configString =
         """
           |mole {

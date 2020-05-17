@@ -19,7 +19,7 @@ class SuperviseTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
     ("Y2", 200L, null, time, java.math.BigDecimal.valueOf(19999.1),11,0.0030,true)))
 
   describe("Test for Supervisor") {
-    it("supervise") {
+    ignore("supervise") {
       val configString1 =
         """
           |checkStatements: [

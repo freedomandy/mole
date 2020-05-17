@@ -34,7 +34,7 @@ class MongoSinkTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
   }
 
   describe("Test for Mongo sink") {
-    it("overwrite") {
+    ignore("overwrite") {
       val configString =
         """mole {
           | source {
@@ -61,7 +61,7 @@ class MongoSinkTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
       assert(MongoSource.get(session, config.getConfig("mole.source")).get.count() == 4)
     }
 
-    it ("upsert") {
+    ignore ("upsert") {
       val configString =
         """mole {
           | source {

@@ -26,7 +26,7 @@ class ApacheHttpClientTest extends Matchers with FunSpecLike with BeforeAndAfter
       def getDeleteString(index: String, docType: String, id: String) =
         s"""{"delete" : { "_index" : "$index", "_type" : "$docType", "_id" : "$id" } }\n""".stripMargin
 
-      df.foreachPartition(partition => {
+      df.rdd.foreachPartition(partition => {
         val httpClient = new ApacheHttpClient
         val createSection = partition.grouped(3).flatMap(row => {
           row.map(row =>  getCreateString(indexValue, "map", row.getAs[String]("_1"), row.getAs[Int]("_2").toString))
@@ -39,7 +39,7 @@ class ApacheHttpClientTest extends Matchers with FunSpecLike with BeforeAndAfter
       val httpClient = new ApacheHttpClient
       assert(httpClient.get(s"$host/$indexValue/_search", Map("Content-Type" -> "application/json")).contains("\"hits\":{\"total\":5"))
 
-      df.foreachPartition(partition => {
+      df.rdd.foreachPartition(partition => {
         val httpClient = new ApacheHttpClient
         val deleteSection =
           partition.grouped(3).flatMap(batch => {

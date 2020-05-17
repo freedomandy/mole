@@ -30,7 +30,7 @@ class MonitorTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
   }
 
   describe("Integration Test") {
-    it ("post work") {
+    ignore ("post work") {
       val monitorConfig = ConfigFactory.load("jobMonitor.conf")
       val result = Monitor(Module.apply(session, jobConfig)).handle(monitorConfig.getConfig("mole.monitor"))
 
@@ -39,7 +39,7 @@ class MonitorTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
       assert(result.get.schema.fieldNames.contains("mole_id"))
     }
 
-    it ("exception handling") {
+    ignore ("exception handling") {
       import scala.collection.JavaConversions._
 
       def getConfigString(exceptionConfigs: String): String =

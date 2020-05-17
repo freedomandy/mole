@@ -28,7 +28,7 @@ class EsRegistryTest  extends Matchers with FunSpecLike with BeforeAndAfterAll {
   }
 
   describe("Test for EsRegistry") {
-    it("insert") {
+    ignore("insert") {
       val syncConfigString =
         """
           |mole {

@@ -12,12 +12,11 @@ import org.freedomandy.mole.commons.sources.Source
 object MongoSource extends Source {
   override def sourceName: String = "MONGODB"
 
-  override def get(session: SparkSession, config: Config): Option[DataFrame] = {
+  override def get(session: SparkSession, config: Config): Option[DataFrame] =
     if (config.hasPath("path")) {
       val destination = config.getString("path")
-      val readConfig = ReadConfig(Map("uri" -> destination, "readPreference.name" -> "secondaryPreferred"))
+      val readConfig  = ReadConfig(Map("uri" -> destination, "readPreference.name" -> "secondaryPreferred"))
 
       Some(MongoSpark.load(session, readConfig))
     } else None
-  }
 }

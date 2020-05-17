@@ -17,7 +17,7 @@ object UniqueChecker extends Checker {
 
     val fields = config.getStringList("fields")
 
-    if (Common.isUnique(dataFrame, fields:_*))
+    if (Common.isUnique(dataFrame, fields: _*))
       Right.apply(dataFrame)
     else
       Left(new UnsatisfiedPropException(s"Records in fields ${fields.toList.mkString(",")} are duplicated"))

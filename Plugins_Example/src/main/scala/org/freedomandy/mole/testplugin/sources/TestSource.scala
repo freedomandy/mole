@@ -13,7 +13,7 @@ class TestSource extends Source {
   override def get(session: SparkSession, config: Config): Option[DataFrame] = {
     val httpClient = new ApacheHttpClient
 
-    val result = httpClient.get("https://www.google.com/",  Map[String,String]())
+    val result = httpClient.get("https://www.google.com/", Map[String, String]())
 
     Some(session.createDataFrame(Seq(("google", result))))
   }

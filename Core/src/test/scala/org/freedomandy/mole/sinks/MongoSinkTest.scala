@@ -10,15 +10,18 @@ import org.scalatest.{BeforeAndAfterAll, FunSpecLike, Matchers}
   */
 class MongoSinkTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
   val session: SparkSession = SparkSession.builder.appName("Test").master("local[*]").getOrCreate()
-  val df: DataFrame = session.createDataFrame(Seq(("Y1", 1000, "c", "james", "b", Some(0.2), 1L),
-    ("Y2", 200, "c", "james", "b", None, 1L),
-    ("Y3", 100, "b", "james", "b", None, 2L),
-    ("Y4", 100, "c", "Andy", "b", Some(5.0), 3L),
-    ("Y5", 99, "c", "james", "b", None, 4L)))
+  val df: DataFrame = session.createDataFrame(
+    Seq(
+      ("Y1", 1000, "c", "james", "b", Some(0.2), 1L),
+      ("Y2", 200, "c", "james", "b", None, 1L),
+      ("Y3", 100, "b", "james", "b", None, 2L),
+      ("Y4", 100, "c", "Andy", "b", Some(5.0), 3L),
+      ("Y5", 99, "c", "james", "b", None, 4L)
+    )
+  )
 
-  override protected def beforeAll(): Unit = {
+  override protected def beforeAll(): Unit =
     super.beforeAll()
-  }
   override protected def afterAll(): Unit = {
     val configString =
       """
@@ -61,7 +64,7 @@ class MongoSinkTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
       assert(MongoSource.get(session, config.getConfig("mole.source")).get.count() == 4)
     }
 
-    ignore ("upsert") {
+    ignore("upsert") {
       val configString =
         """mole {
           | source {

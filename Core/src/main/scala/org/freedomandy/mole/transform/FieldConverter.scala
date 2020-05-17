@@ -19,7 +19,7 @@ object FieldConverter extends FlowStage {
 
   override def transform(config: Config)(dataFrame: DataFrame): DataFrame = {
     val from = getParam[String](config, "from").map(_.split(","))
-    val to = getParam[String](config, "to").map(_.split(","))
+    val to   = getParam[String](config, "to").map(_.split(","))
 
     if (from.isEmpty || to.isEmpty)
       throw new InvalidInputException(s"Invalid params: ${config.toString}")

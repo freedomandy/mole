@@ -11,12 +11,15 @@ import org.scalatest.{BeforeAndAfterAll, FunSpecLike, Matchers}
   * @author Andy Huang on 2018/8/7
   */
 class SuperviseTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
-  val session: SparkSession =  SparkSession.builder.appName("Test").master("local[*]").getOrCreate()
-  val date = new java.util.Date
-  val time = new java.sql.Timestamp(date.getTime)
-  val df: DataFrame = session.createDataFrame(Seq(
-    ("Y1", 1000L, Date.valueOf("2018-12-01"), time, java.math.BigDecimal.valueOf(0.19999),10,1.0,true),
-    ("Y2", 200L, null, time, java.math.BigDecimal.valueOf(19999.1),11,0.0030,true)))
+  val session: SparkSession = SparkSession.builder.appName("Test").master("local[*]").getOrCreate()
+  val date                  = new java.util.Date
+  val time                  = new java.sql.Timestamp(date.getTime)
+  val df: DataFrame = session.createDataFrame(
+    Seq(
+      ("Y1", 1000L, Date.valueOf("2018-12-01"), time, java.math.BigDecimal.valueOf(0.19999), 10, 1.0, true),
+      ("Y2", 200L, null, time, java.math.BigDecimal.valueOf(19999.1), 11, 0.0030, true)
+    )
+  )
 
   describe("Test for Supervisor") {
     ignore("supervise") {
@@ -87,7 +90,7 @@ class SuperviseTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
       val config1 = ConfigFactory.parseString(configString1)
       val config2 = ConfigFactory.parseString(configString2)
       val config3 = ConfigFactory.parseString(configString3)
-      val module = Module.apply(session, ConfigFactory.load("job.conf"))
+      val module  = Module.apply(session, ConfigFactory.load("job.conf"))
 
       assert(module.supervisor.supervise(df, config1).isDefined)
       assert(module.supervisor.supervise(df, config2).isEmpty)

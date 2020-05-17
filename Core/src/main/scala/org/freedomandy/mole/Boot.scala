@@ -13,19 +13,19 @@ object Boot {
 
     val result =
       if (Module.createIfNotExist().getConfig.hasPath("mole.monitor")) {
-        val result = Monitor(Module.createIfNotExist()).handle(Module.createIfNotExist().getConfig.getConfig("mole.monitor"))
+        val result =
+          Monitor(Module.createIfNotExist()).handle(Module.createIfNotExist().getConfig.getConfig("mole.monitor"))
 
         if (result.isDefined) {
           Module.createIfNotExist().loader.run(result.get)
           result.get
-        } else {
+        } else
           throw new UnsatisfiedPropException("Failed to pass the verification process")
-        }
       } else {
-        val extractor = Module.createIfNotExist().extractor
+        val extractor   = Module.createIfNotExist().extractor
         val transformer = Module.createIfNotExist().transformer
-        val loader = Module.createIfNotExist().loader
-        val dfOp = extractor.run()
+        val loader      = Module.createIfNotExist().loader
+        val dfOp        = extractor.run()
 
         if (dfOp.isEmpty)
           throw new InvalidInputException("Failed to load source data frame")

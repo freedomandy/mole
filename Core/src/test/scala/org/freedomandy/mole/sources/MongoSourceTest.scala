@@ -10,15 +10,15 @@ import org.scalatest.{BeforeAndAfterAll, FunSpecLike, Matchers}
 class MongoSourceTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
   describe("Test for Mongo Source") {
     ignore("get") {
-      val session = SparkSession.builder.appName("MOLE Job").master("local[*]").getOrCreate()
+      val session      = SparkSession.builder.appName("MOLE Job").master("local[*]").getOrCreate()
       val configString = """mole {
                            |  source {
                            |    type = "MONGODB"
                            |    path = "mongodb://127.0.0.1:27017/test.test"
                            |  }
                            |}""".stripMargin
-      val config = ConfigFactory.parseString(configString)
-      val source = MongoSource.get(session, config.getConfig("mole.source"))
+      val config       = ConfigFactory.parseString(configString)
+      val source       = MongoSource.get(session, config.getConfig("mole.source"))
 
       assert(source.get.count() == 1)
     }

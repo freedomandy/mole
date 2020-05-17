@@ -11,18 +11,17 @@ object KeyGenerator extends FlowStage {
   override def actionName: String = "KeyGenerating"
 
   override def transform(config: Config)(dataFrame: DataFrame): DataFrame = {
-    val keyParam = getParam[java.util.ArrayList[String]](config, "keyFields")
+    val keyParam                = getParam[java.util.ArrayList[String]](config, "keyFields")
     val keyName: Option[String] = getParam[String](config, "keyName")
 
-    if (keyParam.isDefined) {
-      if (keyParam.get.isEmpty) {
+    if (keyParam.isDefined)
+      if (keyParam.get.isEmpty)
         Common.addIdField(dataFrame, dataFrame.columns.toSet, keyName.getOrElse("_id"))
-      } else {
+      else {
         import scala.collection.JavaConversions._
         Common.addIdField(dataFrame, keyParam.get.toSet, keyName.getOrElse("_id"))
       }
-    } else {
+    else
       Common.addIdField(dataFrame, dataFrame.columns.toSet, keyName.getOrElse("_id"))
-    }
   }
 }

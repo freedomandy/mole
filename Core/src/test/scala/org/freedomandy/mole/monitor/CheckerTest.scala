@@ -10,12 +10,15 @@ import org.scalatest.{BeforeAndAfterAll, FunSpecLike, Matchers}
   * @author Andy Huang on 2018/7/25
   */
 class CheckerTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
-  val session: SparkSession =  SparkSession.builder.appName("Test").master("local[*]").getOrCreate()
-  val date = new java.util.Date
-  val time = new java.sql.Timestamp(date.getTime)
-  val df: DataFrame = session.createDataFrame(Seq(
-    ("Y1", 1000L, Date.valueOf("2018-12-01"), time, java.math.BigDecimal.valueOf(0.19999),10,1.0,true),
-    ("Y2", 200L, null, time, java.math.BigDecimal.valueOf(19999.1),11,0.0030,true)))
+  val session: SparkSession = SparkSession.builder.appName("Test").master("local[*]").getOrCreate()
+  val date                  = new java.util.Date
+  val time                  = new java.sql.Timestamp(date.getTime)
+  val df: DataFrame = session.createDataFrame(
+    Seq(
+      ("Y1", 1000L, Date.valueOf("2018-12-01"), time, java.math.BigDecimal.valueOf(0.19999), 10, 1.0, true),
+      ("Y2", 200L, null, time, java.math.BigDecimal.valueOf(19999.1), 11, 0.0030, true)
+    )
+  )
 
   describe("Test for Checker") {
     it("Count") {
@@ -55,7 +58,6 @@ class CheckerTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |   type = "Unique"
           |   fields: ["_4", "_8"]
           |}""".stripMargin
-
 
       assert(UniqueChecker.verify(df, ConfigFactory.parseString(configString1)).isRight)
       assert(UniqueChecker.verify(df, ConfigFactory.parseString(configString2)).isRight)
@@ -177,7 +179,6 @@ class CheckerTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
            | column = "_8"
            |}
         """.stripMargin
-
 
       assert(ValueChecker.verify(df, ConfigFactory.parseString(configString1)).isRight)
       assert(ValueChecker.verify(df, ConfigFactory.parseString(configString2)).isLeft)

@@ -11,15 +11,21 @@ import org.scalatest.{BeforeAndAfterAll, FunSpecLike, Matchers}
   * @author Andy Huang on 2018/7/31
   */
 class TimeFormatterTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
-  val session: SparkSession = SparkSession.builder.config("spark.sql.warehouse.dir", "./spark-warehouse").appName("Test").master("local[*]").getOrCreate()
+  val session: SparkSession = SparkSession.builder
+    .config("spark.sql.warehouse.dir", "./spark-warehouse")
+    .appName("Test")
+    .master("local[*]")
+    .getOrCreate()
 
-  val currentTime: Calendar = Calendar.getInstance()
+  val currentTime: Calendar      = Calendar.getInstance()
   val currentDate: java.sql.Date = new Date(currentTime.getTimeInMillis)
 
-
-  val df: DataFrame = session.createDataFrame(Seq(
-    ("Y1", 1000, currentDate, currentTime.getTimeInMillis, java.math.BigDecimal.valueOf(0.19999)),
-    ("Y2", 200, null, currentTime.getTimeInMillis, java.math.BigDecimal.valueOf(19999.1))))
+  val df: DataFrame = session.createDataFrame(
+    Seq(
+      ("Y1", 1000, currentDate, currentTime.getTimeInMillis, java.math.BigDecimal.valueOf(0.19999)),
+      ("Y2", 200, null, currentTime.getTimeInMillis, java.math.BigDecimal.valueOf(19999.1))
+    )
+  )
 
   describe("Time Formatter") {
     println(s"Current Time: ${currentTime.getTime}")
@@ -39,7 +45,11 @@ class TimeFormatterTest extends Matchers with FunSpecLike with BeforeAndAfterAll
 
       val result = TimeFormatter.transform(ConfigFactory.parseString(configString))(df)
 
-      assert(result.select("time").first().getAs[Long]("time") == dateFormat.parse(currentDate.toLocalDate.toString).getTime())
+      assert(
+        result.select("time").first().getAs[Long]("time") == dateFormat
+          .parse(currentDate.toLocalDate.toString)
+          .getTime()
+      )
     }
   }
 }

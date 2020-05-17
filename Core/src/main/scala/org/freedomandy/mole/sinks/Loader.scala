@@ -13,19 +13,20 @@ case class Loader(session: SparkSession, config: Config) {
   import collection.JavaConversions._
   private val sinkList: List[Config] = config.getObjectList("mole.sink.destinations").toList.map(_.toConfig)
 
-  def loadPlugins(): Function[Config, (DataFrame, String)=> Unit] = {
+  def loadPlugins(): Function[Config, (DataFrame, String) => Unit] = {
     def getPartialFunction(synchronizer: Sink): PartialFunction[Config, (DataFrame, String) => Unit] = {
       case config: Config => synchronizer.overwrite(config)
     }
-    def getSynchronizeFunc(customTransform: Option[PartialFunction[Config, (DataFrame, String) => Unit]]): Function[Config, (DataFrame, String)=> Unit] = {
-      def getOperation(config: Config, sink: Sink): (DataFrame, String) => Unit = {
+    def getSynchronizeFunc(
+        customTransform: Option[PartialFunction[Config, (DataFrame, String) => Unit]]
+    ): Function[Config, (DataFrame, String) => Unit] = {
+      def getOperation(config: Config, sink: Sink): (DataFrame, String) => Unit =
         if (config.getString("operation") == "OVERWRITE")
           sink.overwrite(config)
         else if (config.getString("operation") == "UPSERT")
           sink.upsert(config)
         else
           throw new InvalidInputException("Unsupported sink operation")
-      }
 
       val basePF: PartialFunction[Config, (DataFrame, String) => Unit] = {
         case config: Config if config.getString("type") == EsSink.sinkName =>
@@ -66,13 +67,12 @@ case class Loader(session: SparkSession, config: Config) {
         config.getString("mole.sink.primaryKey")
       else "_id"
 
-    sinkList.map(config => matchRules(config)).foreach(func => {
-      try {
-        func(dataFrame, keyField)
-      } catch {
+    sinkList.map(config => matchRules(config)).foreach { func =>
+      try func(dataFrame, keyField)
+      catch {
         case t: Throwable =>
           println(s"Failed to synchronize data, due to ${t.toString}")
       }
-    })
+    }
   }
 }

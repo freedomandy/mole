@@ -10,20 +10,20 @@ import org.freedomandy.mole.transform.Transformer
 /**
   * @author Andy Huang on 2018/8/21
   */
-class Module private(session: SparkSession, config: Config) {
+class Module private (session: SparkSession, config: Config) {
   def getSession: SparkSession = session
-  def getConfig: Config = config
+  def getConfig: Config        = config
 
-  val extractor = Extractor(session, config)
+  val extractor   = Extractor(session, config)
   val transformer = Transformer(session, config)
-  val loader = Loader(session, config)
-  val supervisor = Supervisor(config)
+  val loader      = Loader(session, config)
+  val supervisor  = Supervisor(config)
 }
 
 object Module {
-  private val config: Config = ConfigFactory.load()
+  private val config: Config             = ConfigFactory.load()
   private lazy val session: SparkSession = SparkSession.builder.enableHiveSupport().appName("MOLE Job").getOrCreate()
-  private lazy val module = new Module(session, config)
+  private lazy val module                = new Module(session, config)
 
   def createIfNotExist(): Module = module
 

@@ -9,23 +9,25 @@ import org.scalatest.{BeforeAndAfterAll, FunSpecLike, Matchers}
 /**
   * @author Andy Huang on 2018/9/11
   */
-class EsRegistryTest  extends Matchers with FunSpecLike with BeforeAndAfterAll {
-  val session: SparkSession =  SparkSession.builder.appName("Test").master("local[*]").getOrCreate()
-  val df: DataFrame = session.createDataFrame(Seq(("Y1", 100, "c", "james", "b", Some(0.2), 1L),
-    ("Y2", 100, "c", "james", "b", None, 1L),
-    ("Y3", 100, "b", "james", "b", None, 2L),
-    ("Y4", 100, "c", "Andy", "b", Some(5.0), 3L),
-    ("Y5", 99, "c", "james", "b", None, 4L))).toDF("uid", "credit", "type", "name", "category", "score", "amount")
+class EsRegistryTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
+  val session: SparkSession = SparkSession.builder.appName("Test").master("local[*]").getOrCreate()
+  val df: DataFrame = session
+    .createDataFrame(
+      Seq(
+        ("Y1", 100, "c", "james", "b", Some(0.2), 1L),
+        ("Y2", 100, "c", "james", "b", None, 1L),
+        ("Y3", 100, "b", "james", "b", None, 2L),
+        ("Y4", 100, "c", "Andy", "b", Some(5.0), 3L),
+        ("Y5", 99, "c", "james", "b", None, 4L)
+      )
+    )
+    .toDF("uid", "credit", "type", "name", "category", "score", "amount")
 
-  override protected def beforeAll(): Unit = {
+  override protected def beforeAll(): Unit =
     super.beforeAll()
-  }
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     // TODO: Drop test ES index
-
-
     super.afterAll()
-  }
 
   describe("Test for EsRegistry") {
     ignore("insert") {

@@ -18,7 +18,9 @@ case class PostWorkHandler(session: SparkSession, config: Config) {
         (dataFrame: DataFrame, startTime: Long) => postWorker.execute(session, dataFrame, startTime, config)
     }
 
-    def getWorkerFunction(customWorker: Option[PartialFunction[Config, PostWorkFunc]]): Function[Config, PostWorkFunc] = {
+    def getWorkerFunction(
+        customWorker: Option[PartialFunction[Config, PostWorkFunc]]
+    ): Function[Config, PostWorkFunc] = {
       val basePF: PartialFunction[Config, PostWorkFunc] = {
         case c: Config if c.getString("type") == EsRegistry.workName =>
           (dataFrame: DataFrame, startTime: Long) => EsRegistry.execute(session, dataFrame, startTime, config)
@@ -30,7 +32,8 @@ case class PostWorkHandler(session: SparkSession, config: Config) {
           basePF
 
       finalPF.orElse({
-        case config: Config => throw new InvalidInputException(s"Unsupported post worker type: ${config.getString("type")}")
+        case config: Config =>
+          throw new InvalidInputException(s"Unsupported post worker type: ${config.getString("type")}")
       })
     }
 
@@ -50,7 +53,7 @@ case class PostWorkHandler(session: SparkSession, config: Config) {
       Some(new InvalidInputException("Post work config should be provided"))
     else {
       val postWorkFunc = loadPlugins()
-      val result = postWorkFunc(config.getConfig("mole.postWork"))(dataFrame, startTime)
+      val result       = postWorkFunc(config.getConfig("mole.postWork"))(dataFrame, startTime)
 
       result
     }

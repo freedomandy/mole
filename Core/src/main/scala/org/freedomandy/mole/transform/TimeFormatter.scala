@@ -10,7 +10,11 @@ import org.freedomandy.mole.commons.transform.FlowStage
 object TimeFormatter extends FlowStage {
   override def actionName: String = "Time"
 
-  override def transform(config: Config)(dataFrame: DataFrame): DataFrame = {
-    Common.addTimeField(dataFrame, config.getString("field"), config.getString("format"), config.getString("outputName"))
-  }
+  override def transform(config: Config)(dataFrame: DataFrame): DataFrame =
+    Common.addTimeField(
+      dataFrame,
+      config.getString("field"),
+      config.getString("format"),
+      config.getString("outputName")
+    )
 }

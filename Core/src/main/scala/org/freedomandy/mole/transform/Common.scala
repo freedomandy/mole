@@ -14,38 +14,38 @@ object Common {
     val tempFieldPrefix = "tmp_"
     val getHashValue = (fields: Seq[Any], separator: String) => {
       val key = fields.filter(_ != null).mkString(separator)
-      val md = java.security.MessageDigest.getInstance("SHA-1")
+      val md  = java.security.MessageDigest.getInstance("SHA-1")
 
       md.digest(key.getBytes("UTF-8")).map("%02x".format(_)).mkString
     }
-    val getKey = udf(getHashValue)
-    val castToString = (s: Any) => if(s == null) null else s.toString
-    val toStringUDF = udf[String, Any](castToString)
+    val getKey       = udf(getHashValue)
+    val castToString = (s: Any) => if (s == null) null else s.toString
+    val toStringUDF  = udf[String, Any](castToString)
 
-    if (key.size == 1) {
+    if (key.size == 1)
       df.withColumnRenamed(key.head, keyName)
-    } else {
+    else {
       // Casting all key fields as String type
-      val castedDF = key.foldLeft(df)((df, c) => {
+      val castedDF = key.foldLeft(df) { (df, c) =>
         df.withColumn(tempFieldPrefix + c, toStringUDF(col(c)))
-      })
+      }
 
       // Add id field
       val tempFields = key.toList.map(tempFieldPrefix + _)
-      val keys = array(tempFields.map(col): _*)
-      val ddf = castedDF.withColumn(keyName, getKey(keys, lit("_")))
+      val keys       = array(tempFields.map(col): _*)
+      val ddf        = castedDF.withColumn(keyName, getKey(keys, lit("_")))
 
       // Remove temp column
-      tempFields.foldLeft(ddf)((ddf, c) => {
+      tempFields.foldLeft(ddf) { (ddf, c) =>
         ddf.drop(c)
-      })
+      }
     }
   }
 
-  def addTimeField(df: DataFrame, timeFieldName: String, format: String, outputName: String): DataFrame = {
-    if (format == "unix_timestamp") {
+  def addTimeField(df: DataFrame, timeFieldName: String, format: String, outputName: String): DataFrame =
+    if (format == "unix_timestamp")
       df.withColumn(outputName, col(timeFieldName) * 1000)
-    } else {
+    else {
       val getTimestamp = (time: String) => {
         val df = new java.text.SimpleDateFormat(format)
 
@@ -55,22 +55,19 @@ object Common {
 
       df.withColumn(outputName, getTime(col(timeFieldName)))
     }
-  }
 
-  def rename(df: DataFrame, mapping: (String, String)): DataFrame = {
+  def rename(df: DataFrame, mapping: (String, String)): DataFrame =
     df.withColumnRenamed(mapping._1, mapping._2)
-  }
 
-  def dropFieldsExcept(fields: List[String])(df: DataFrame, field: String): DataFrame = {
+  def dropFieldsExcept(fields: List[String])(df: DataFrame, field: String): DataFrame =
     if (fields.toSet.contains(field))
       df
     else
       df.drop(field)
-  }
 
   def castDateToString(dataFrame: DataFrame): DataFrame = {
     def toString(dataFrame: DataFrame, column: String): DataFrame = {
-      val getStr = udf((date: Date) => if(date == null) None else Some(date.toString))
+      val getStr   = udf((date: Date) => if (date == null) None else Some(date.toString))
       val tempName = "$" + column
 
       dataFrame.withColumn(tempName, getStr(col(column))).drop(column).withColumnRenamed(tempName, column)
@@ -85,7 +82,7 @@ object Common {
 
   def castTimestampToLong(dataFrame: DataFrame): DataFrame = {
     def toString(dataFrame: DataFrame, column: String): DataFrame = {
-      val getStr = udf((time: Timestamp) => if (time == null) None else Some(time.getTime))
+      val getStr   = udf((time: Timestamp) => if (time == null) None else Some(time.getTime))
       val tempName = "$" + column
 
       dataFrame.withColumn(tempName, getStr(col(column))).drop(column).withColumnRenamed(tempName, column)
@@ -98,7 +95,7 @@ object Common {
 
   def castDecimalToDouble(dataFrame: DataFrame): DataFrame = {
     def toDouble(dataFrame: DataFrame, column: String): DataFrame = {
-      val getStr = udf((decimal: java.math.BigDecimal) => if (decimal == null) None else Some(decimal.doubleValue()))
+      val getStr   = udf((decimal: java.math.BigDecimal) => if (decimal == null) None else Some(decimal.doubleValue()))
       val tempName = "$" + column
 
       dataFrame.withColumn(tempName, getStr(col(column))).drop(column).withColumnRenamed(tempName, column)
@@ -109,13 +106,12 @@ object Common {
     decimalColumns.foldLeft(dataFrame)(toDouble)
   }
 
-  def isUnique(dataFrame: DataFrame, fieldName: String*): Boolean = {
-    dataFrame.select(fieldName.head, fieldName.tail:_*).distinct().count == dataFrame.count()
-  }
+  def isUnique(dataFrame: DataFrame, fieldName: String*): Boolean =
+    dataFrame.select(fieldName.head, fieldName.tail: _*).distinct().count == dataFrame.count()
 
   def covertToStruct(fieldName: String, dropCol: Boolean, fields: Map[String, String])(df: DataFrame): DataFrame = {
     val convertDf = df.withColumn(fieldName, struct(fields.toList.map(f => col(f._2).alias(f._1)): _*))
-    if(dropCol) {
+    if (dropCol) {
       val keepCol = convertDf.columns.toList.diff(fields.toList.map(_._2))
       convertDf.columns.foldLeft(convertDf)(Common.dropFieldsExcept(keepCol))
     } else convertDf
@@ -123,7 +119,7 @@ object Common {
 
   def covertToMap(fieldName: String, dropCol: Boolean, fields: Map[String, String])(df: DataFrame): DataFrame = {
     val convertDf = df.withColumn(fieldName, map(fields.toList.flatMap(f => List(lit(f._1), col(f._2))): _*))
-    if(dropCol) {
+    if (dropCol) {
       val keepCol = convertDf.columns.toList.diff(fields.toList.map(_._2))
       convertDf.columns.foldLeft(convertDf)(Common.dropFieldsExcept(keepCol))
     } else convertDf

@@ -20,7 +20,7 @@ object KafkaPublisher {
     val f = () => {
       println("Initialize connection..")
 
-      val  props = new Properties()
+      val props = new Properties()
 
       props.put("bootstrap.servers", s"$host:$port")
       props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")

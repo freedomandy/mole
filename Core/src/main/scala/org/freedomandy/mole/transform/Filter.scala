@@ -30,17 +30,16 @@ object Filter extends FlowStage {
     }
   }
 
-  def filter(dataFrame: DataFrame, fieldName: String, regex: String): DataFrame = {
+  def filter(dataFrame: DataFrame, fieldName: String, regex: String): DataFrame =
     dataFrame.filter(col(fieldName).rlike(regex))
-  }
 
   override def actionName: String = "Filtering"
 
   override def transform(config: Config)(dataFrame: DataFrame): DataFrame = {
     // TODO: Provide the option to use regex
-    val fieldName= getParam[String](config, "field")
-    val operator = getParam[String](config, "operator")
-    val value = getParam[String](config, "value")
+    val fieldName = getParam[String](config, "field")
+    val operator  = getParam[String](config, "operator")
+    val value     = getParam[String](config, "value")
 
     if (fieldName.isEmpty || operator.isEmpty || value.isEmpty)
       throw new InvalidInputException(s"Invalid params: ${config.toString}")

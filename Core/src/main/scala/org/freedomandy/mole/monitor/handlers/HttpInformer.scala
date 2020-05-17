@@ -18,23 +18,22 @@ object HttpInformer extends ErrorHandler {
 
   override def notify(message: String, config: Config): Unit = {
     import scala.collection.JavaConversions._
-    val headers: Map[String, String] = if (config.hasPath("headers")) config.getConfigList("headers").map(
-      config => config.getString("key") -> config.getString("value")).toMap else Map()
+    val headers: Map[String, String] =
+      if (config.hasPath("headers"))
+        config.getConfigList("headers").map(config => config.getString("key") -> config.getString("value")).toMap
+      else Map()
     val payload =
-      if (config.hasPath("payLoad")) {
+      if (config.hasPath("payLoad"))
         if (config.getString("payLoad").contains("@msg"))
-
-          try {
-            Some(config.getString("payLoad").replaceAll("@msg", message))
-          } catch { // In case the exception throw from executors
+          try Some(config.getString("payLoad").replaceAll("@msg", message))
+          catch { // In case the exception throw from executors
             case e: IndexOutOfBoundsException =>
               Some(config.getString("payLoad").replaceAll("@msg", "exception throw from executors"))
           }
         else
           Some(config.getString("payLoad"))
-      } else {
+      else
         None
-      }
 
     val httpClient: ApacheHttpClient = new ApacheHttpClient
 

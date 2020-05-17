@@ -19,7 +19,9 @@ case class Transformer(session: SparkSession, config: Config) {
       case config: Config if config.getString("action") == flowStage.actionName =>
         flowStage.transform(config)
     }
-    def getTransformFunc(customTransform: Option[PartialFunction[Config, DataFrame => DataFrame]]): Function[Config, DataFrame => DataFrame] = {
+    def getTransformFunc(
+        customTransform: Option[PartialFunction[Config, DataFrame => DataFrame]]
+    ): Function[Config, DataFrame => DataFrame] = {
       val basePF: PartialFunction[Config, DataFrame => DataFrame] = {
         case config: Config if config.getString("action") == Filler.actionName =>
           Filler.transform(config)
@@ -60,13 +62,11 @@ case class Transformer(session: SparkSession, config: Config) {
 
   def transform(dataFrame: DataFrame): DataFrame = {
     val transformRules = loadPlugins()
-    val transformFlow = actionList.map(config => transformRules(config))
+    val transformFlow  = actionList.map(config => transformRules(config))
 
-    transformFlow.foldLeft[DataFrame](dataFrame)((df, func) => { func.apply(df) })
+    transformFlow.foldLeft[DataFrame](dataFrame)((df, func) => func.apply(df))
   }
 
-  def run(dataFrame: DataFrame): DataFrame = {
+  def run(dataFrame: DataFrame): DataFrame =
     transform(dataFrame)
-  }
 }
-

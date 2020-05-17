@@ -11,11 +11,11 @@ object QueryExecutor extends FlowStage {
     import collection.JavaConversions._
     // Read params from config
     val getTempQuery: Option[List[Config]] =
-      if(config.hasPath("tempViews"))
+      if (config.hasPath("tempViews"))
         Some(config.getObjectList("tempViews").toList.map(x => x.toConfig))
       else None
     val sourceView = getParam[String](config, "sourceViewName")
-    val query = getParam[String](config, "query")
+    val query      = getParam[String](config, "query")
 
     if (query.isEmpty || sourceView.isEmpty)
       throw new InvalidInputException(s"Invalid params: ${config.toString}")
@@ -26,15 +26,14 @@ object QueryExecutor extends FlowStage {
   def queryAction(df: DataFrame, tmpQuery: Option[List[Config]], sourceView: String, query: String): DataFrame = {
     val session = SparkSession.builder.getOrCreate()
 
-    if(session.catalog.tableExists(sourceView)) {
+    if (session.catalog.tableExists(sourceView)) {
       session.catalog.dropTempView(sourceView)
       df.createOrReplaceTempView(sourceView)
-    } else {
+    } else
       df.createOrReplaceTempView(sourceView)
-    }
-    if(tmpQuery.isDefined) {
+    if (tmpQuery.isDefined)
       tmpQuery.get.foreach { config =>
-        val view = getParam[String](config, "name")
+        val view  = getParam[String](config, "name")
         val query = getParam[String](config, "query")
 
         if (view.isEmpty || query.isEmpty)
@@ -44,9 +43,8 @@ object QueryExecutor extends FlowStage {
 
         tempDF.createOrReplaceTempView(view.get)
       }
-    }
 
-    if(query.contains(sourceView))
+    if (query.contains(sourceView))
       session.sql(query)
     else
       throw new InvalidInputException(s"Invalid query: ${query.toString}")

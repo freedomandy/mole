@@ -16,9 +16,10 @@ object KafkaInformer extends ErrorHandler {
 
   override def isRecover: Boolean = false
 
-  override def notify(message: String, config: Config): Unit = {
-    KPublisher.apply(config.getString("url")).send(config.getString("topic"), config.getString("key"), config.getString("value"))
-  }
+  override def notify(message: String, config: Config): Unit =
+    KPublisher
+      .apply(config.getString("url"))
+      .send(config.getString("topic"), config.getString("key"), config.getString("value"))
 
   override def recover(dataFrame: DataFrame, config: Config): Either[BaseException, DataFrame] =
     Left(new UnsupportedException(s"Non support recover mechanism in $handlerName handler"))

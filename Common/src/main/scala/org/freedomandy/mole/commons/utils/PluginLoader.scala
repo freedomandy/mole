@@ -16,7 +16,7 @@ import org.freedomandy.mole.commons.transform.FlowStage
   */
 object PluginLoader {
   def loadSourcePlugins(config: Config): List[Source] = {
-    def loadSourceInstance(path: String): Source = {
+    def loadSourceInstance(path: String): Source =
       new Source with Serializable {
         val sourceBehaviors: Source = Class.forName(path).newInstance().asInstanceOf[Source]
 
@@ -25,16 +25,15 @@ object PluginLoader {
         override def get(session: SparkSession, config: Config): Option[DataFrame] =
           sourceBehaviors.get(session, config)
       }
-    }
 
     import scala.collection.JavaConversions._
-    if (config.hasPath("plugins.source")) {
+    if (config.hasPath("plugins.source"))
       config.getStringList("plugins.source").toList.map(loadSourceInstance)
-    } else Nil
+    else Nil
   }
 
   def loadTransformPlugins(config: Config): List[FlowStage] = {
-    def loadFlowInstance(path: String): FlowStage = {
+    def loadFlowInstance(path: String): FlowStage =
       new FlowStage with Serializable {
         val flowStage: FlowStage = Class.forName(path).newInstance().asInstanceOf[FlowStage]
 
@@ -44,16 +43,15 @@ object PluginLoader {
         override def actionName: String =
           flowStage.actionName
       }
-    }
 
     import scala.collection.JavaConversions._
-    if (config.hasPath("plugins.transform")) {
+    if (config.hasPath("plugins.transform"))
       config.getStringList("plugins.transform").toList.map(loadFlowInstance)
-    } else Nil
+    else Nil
   }
 
   def loadSinkPlugins(config: Config): List[Sink] = {
-    def loadSinkInstance(path: String): Sink = {
+    def loadSinkInstance(path: String): Sink =
       new Sink with Serializable {
         val synchronizer: Sink = Class.forName(path).newInstance().asInstanceOf[Sink]
 
@@ -68,35 +66,34 @@ object PluginLoader {
         override def overwrite(config: Config)(dataFrame: DataFrame, keyField: String): Unit =
           synchronizer.overwrite(config)(dataFrame, keyField)
       }
-    }
 
     import scala.collection.JavaConversions._
-    if (config.hasPath("plugins.sink")) {
+    if (config.hasPath("plugins.sink"))
       config.getStringList("plugins.sink").toList.map(loadSinkInstance)
-    } else Nil
+    else Nil
   }
 
   def loadCheckerPlugins(config: Config): List[Checker] = {
-    def loadCheckerInstance(path: String): Checker = {
+    def loadCheckerInstance(path: String): Checker =
       new Checker {
         val verifier: Checker = Class.forName(path).newInstance().asInstanceOf[Checker]
 
-        override def verify(dataFrame: DataFrame, config: Config): Either[Throwable, DataFrame] = verifier.verify(dataFrame, config)
+        override def verify(dataFrame: DataFrame, config: Config): Either[Throwable, DataFrame] =
+          verifier.verify(dataFrame, config)
 
         override def verifierName: String = verifier.verifierName
       }
-    }
 
     println("Load checker plugins...")
 
     import scala.collection.JavaConversions._
-    if (config.hasPath("plugins.verifier")) {
+    if (config.hasPath("plugins.verifier"))
       config.getStringList("plugins.verifier").toList.map(loadCheckerInstance)
-    } else Nil
+    else Nil
   }
 
   def loadErrorHandlerPlugins(config: Config): List[ErrorHandler] = {
-    def loadErrHandlerInstance(path: String): ErrorHandler = {
+    def loadErrHandlerInstance(path: String): ErrorHandler =
       new ErrorHandler with Serializable {
         val errorHandler: ErrorHandler = Class.forName(path).newInstance().asInstanceOf[ErrorHandler]
 
@@ -108,33 +105,36 @@ object PluginLoader {
 
         override def notify(message: String, config: Config): Unit = errorHandler.notify(message, config)
 
-        override def recover(dataFrame: DataFrame, config: Config): Either[BaseException, DataFrame] = errorHandler.recover(dataFrame, config)
+        override def recover(dataFrame: DataFrame, config: Config): Either[BaseException, DataFrame] =
+          errorHandler.recover(dataFrame, config)
       }
-    }
 
     println("Load error handler plugins...")
 
     import scala.collection.JavaConversions._
-    if (config.hasPath("plugins.errorHandler")) {
+    if (config.hasPath("plugins.errorHandler"))
       config.getStringList("plugins.errorHandler").toList.map(loadErrHandlerInstance)
-    } else Nil
+    else Nil
   }
 
   def loadPostWorkPlugins(config: Config): List[PostWorker] = {
-    def loadPostWorkInstance(path: String): PostWorker = {
+    def loadPostWorkInstance(path: String): PostWorker =
       new PostWorker {
         val worker: PostWorker = Class.forName(path).newInstance().asInstanceOf[PostWorker]
 
         override def workName: String = worker.workName
 
-        override def execute(session: SparkSession, dataFrame: DataFrame, startTime: Long, jobConfig: Config):
-        Option[Throwable] = worker.execute(session, dataFrame, startTime, jobConfig)
+        override def execute(
+            session: SparkSession,
+            dataFrame: DataFrame,
+            startTime: Long,
+            jobConfig: Config
+        ): Option[Throwable] = worker.execute(session, dataFrame, startTime, jobConfig)
       }
-    }
 
     import scala.collection.JavaConversions._
-    if (config.hasPath("plugins.postWorker")) {
+    if (config.hasPath("plugins.postWorker"))
       config.getStringList("plugins.postWorker").toList.map(loadPostWorkInstance)
-    } else Nil
+    else Nil
   }
 }

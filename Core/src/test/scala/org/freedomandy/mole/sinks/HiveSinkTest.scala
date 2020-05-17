@@ -11,11 +11,24 @@ import org.scalatest.{BeforeAndAfterAll, FunSpecLike, Matchers}
   * @author Andy Huang on 2018/7/18
   */
 class HiveSinkTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
-  val session: SparkSession = SparkSession.builder.config("spark.sql.warehouse.dir", "./spark-warehouse").appName("Test").master("local[*]").getOrCreate()
+  val session: SparkSession = SparkSession.builder
+    .config("spark.sql.warehouse.dir", "./spark-warehouse")
+    .appName("Test")
+    .master("local[*]")
+    .getOrCreate()
   val date = new java.util.Date
-  val df: DataFrame = session.createDataFrame(Seq(
-    ("Y1", 1000, Date.valueOf("2018-12-01"), new java.sql.Timestamp(date.getTime), java.math.BigDecimal.valueOf(0.19999)),
-    ("Y2", 200, null, new java.sql.Timestamp(date.getTime), java.math.BigDecimal.valueOf(19999.1))))
+  val df: DataFrame = session.createDataFrame(
+    Seq(
+      (
+        "Y1",
+        1000,
+        Date.valueOf("2018-12-01"),
+        new java.sql.Timestamp(date.getTime),
+        java.math.BigDecimal.valueOf(0.19999)
+      ),
+      ("Y2", 200, null, new java.sql.Timestamp(date.getTime), java.math.BigDecimal.valueOf(19999.1))
+    )
+  )
 
   override protected def beforeAll(): Unit = {
     session.sql("CREATE DATABASE IF NOT EXISTS test")
@@ -44,7 +57,7 @@ class HiveSinkTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |   query = "SELECT * FROM test.testTable"
           |}
         """.stripMargin
-      val config = ConfigFactory.parseString(configString)
+      val config     = ConfigFactory.parseString(configString)
       val readConfig = ConfigFactory.parseString(readConfigString)
 
       HiveSink.overwrite(config)(df, "_1")
@@ -68,15 +81,30 @@ class HiveSinkTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |   query = "SELECT * FROM test.testTable"
           |}
         """.stripMargin
-      val config = ConfigFactory.parseString(configString)
+      val config     = ConfigFactory.parseString(configString)
       val readConfig = ConfigFactory.parseString(readConfigString)
 
       HiveSink.overwrite(config)(df, "_1")
 
-      val upsertDf: DataFrame = session.createDataFrame(Seq(
-        ("Y1", 1000, Date.valueOf("2018-12-01"), new java.sql.Timestamp(date.getTime), java.math.BigDecimal.valueOf(0.19999)),
-        ("Y2", 200, null, new java.sql.Timestamp(date.getTime), java.math.BigDecimal.valueOf(0.19999)),
-        ("Y3", 1000, Date.valueOf("2018-12-01"), new java.sql.Timestamp(date.getTime), java.math.BigDecimal.valueOf(0.19999))))
+      val upsertDf: DataFrame = session.createDataFrame(
+        Seq(
+          (
+            "Y1",
+            1000,
+            Date.valueOf("2018-12-01"),
+            new java.sql.Timestamp(date.getTime),
+            java.math.BigDecimal.valueOf(0.19999)
+          ),
+          ("Y2", 200, null, new java.sql.Timestamp(date.getTime), java.math.BigDecimal.valueOf(0.19999)),
+          (
+            "Y3",
+            1000,
+            Date.valueOf("2018-12-01"),
+            new java.sql.Timestamp(date.getTime),
+            java.math.BigDecimal.valueOf(0.19999)
+          )
+        )
+      )
 
       HiveSink.upsert(config)(upsertDf, "_1")
 
@@ -111,8 +139,8 @@ class HiveSinkTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |   query = "SELECT * FROM test.testTable"
           |}
         """.stripMargin
-      val config1 = ConfigFactory.parseString(configString1)
-      val config2 = ConfigFactory.parseString(configString2)
+      val config1    = ConfigFactory.parseString(configString1)
+      val config2    = ConfigFactory.parseString(configString2)
       val readConfig = ConfigFactory.parseString(readConfigString)
 
       HiveSink.overwrite(config1)(df, "_1")

@@ -10,10 +10,9 @@ import org.freedomandy.mole.commons.sources.Source
 object HiveSource extends Source {
   override def sourceName: String = "HIVE"
 
-  override def get(session: SparkSession, config: Config): Option[DataFrame] = {
+  override def get(session: SparkSession, config: Config): Option[DataFrame] =
     if (config.hasPath("query")) {
       val query = config.getString("query")
       Some(session.sql(query))
     } else None
-  }
 }

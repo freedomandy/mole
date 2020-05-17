@@ -22,13 +22,13 @@ class JDBCSourceTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |  query = "SELECT name,T.amount, T.id FROM ACCOUNT A, TRANSACTION T WHERE A.id = T.customerId"
           |}
         """.stripMargin
-      val config = ConfigFactory.parseString(configString)
+      val config  = ConfigFactory.parseString(configString)
       val session = SparkSession.builder.appName("Test").master("local[*]").getOrCreate()
-      val df = JDBCSource.get(session, config).get
+      val df      = JDBCSource.get(session, config).get
 
       assert(df.count() == 2)
     }
-    ignore ("Oracle") {
+    ignore("Oracle") {
       val configString =
         """
           |{
@@ -41,9 +41,9 @@ class JDBCSourceTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |  query = "SELECT name,T.amount, T.id FROM ACCOUNT A, TRANSACTION T WHERE A.id = T.customerId"
           |}
         """.stripMargin
-      val config = ConfigFactory.parseString(configString)
+      val config  = ConfigFactory.parseString(configString)
       val session = SparkSession.builder.appName("Test").master("local[*]").getOrCreate()
-      val df = JDBCSource.get(session, config).get
+      val df      = JDBCSource.get(session, config).get
 
       println(df.schema)
 

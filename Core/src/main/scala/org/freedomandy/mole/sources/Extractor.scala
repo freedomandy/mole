@@ -10,11 +10,13 @@ import org.freedomandy.mole.commons.utils.PluginLoader
   * @author Andy Huang on 2018/6/3
   */
 case class Extractor(session: SparkSession, config: Config) {
-  def loadPlugins(): Function[String,  Option[DataFrame]] = {
-    def getPluginSource(sourceConfig: Config)(sourceBehaviors: Source): PartialFunction[String,  Option[DataFrame]] = {
+  def loadPlugins(): Function[String, Option[DataFrame]] = {
+    def getPluginSource(sourceConfig: Config)(sourceBehaviors: Source): PartialFunction[String, Option[DataFrame]] = {
       case s: String if s == sourceBehaviors.sourceName => sourceBehaviors.get(session, sourceConfig)
     }
-    def getSourceOptions(sourceConfig: Config)(customSource: Option[PartialFunction[String,  Option[DataFrame]]]): Function[String,  Option[DataFrame]] = {
+    def getSourceOptions(
+        sourceConfig: Config
+    )(customSource: Option[PartialFunction[String, Option[DataFrame]]]): Function[String, Option[DataFrame]] = {
       val basePF: PartialFunction[String, Option[DataFrame]] = {
         case s: String if s == HiveSource.sourceName =>
           HiveSource.get(session, sourceConfig)
@@ -35,11 +37,11 @@ case class Extractor(session: SparkSession, config: Config) {
     }
 
     val sourceConfig = config.getConfig("mole.source")
-    val plugins = PluginLoader.loadSourcePlugins(config)
+    val plugins      = PluginLoader.loadSourcePlugins(config)
 
-    if (plugins.isEmpty) {
+    if (plugins.isEmpty)
       getSourceOptions(sourceConfig)(None)
-    } else {
+    else {
       val pluginSources = plugins.map(getPluginSource(sourceConfig)).reduce(_ orElse _)
 
       getSourceOptions(sourceConfig)(Some(pluginSources))

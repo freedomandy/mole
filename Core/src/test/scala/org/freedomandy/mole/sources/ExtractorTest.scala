@@ -20,7 +20,7 @@ class ExtractorTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
           |  }
           |}
         """.stripMargin
-      val config = ConfigFactory.parseString(configString)
+      val config    = ConfigFactory.parseString(configString)
       val extractor = Extractor(session, config)
 
       assert(extractor.run().get.count() == 1)

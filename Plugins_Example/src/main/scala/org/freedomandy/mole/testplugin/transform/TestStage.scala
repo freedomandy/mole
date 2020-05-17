@@ -8,13 +8,13 @@ import org.freedomandy.mole.commons.transform.FlowStage
 /**
   * @author Andy Huang on 2018/5/30
   */
-class TestStage extends FlowStage  {
+class TestStage extends FlowStage {
   override def actionName: String = "TEST-ONLY"
 
   override def transform(config: Config)(dataFrame: DataFrame): DataFrame = {
     // Read params from config
-    val fieldName= getParam[String](config, "field")
-    val operator = getParam[String](config, "operator")
+    val fieldName = getParam[String](config, "field")
+    val operator  = getParam[String](config, "operator")
 
     if (fieldName.isEmpty || operator.isEmpty)
       throw new InvalidInputException(s"Invalid params: ${config.toString}")
@@ -39,4 +39,3 @@ class TestStage extends FlowStage  {
     }
   }
 }
-

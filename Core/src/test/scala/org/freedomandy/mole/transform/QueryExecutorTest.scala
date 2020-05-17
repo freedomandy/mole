@@ -11,11 +11,24 @@ import org.scalatest.{BeforeAndAfterAll, FunSpecLike, Matchers}
   * @author Andy Huang on 2018/7/31
   */
 class QueryExecutorTest extends Matchers with FunSpecLike with BeforeAndAfterAll {
-  val session: SparkSession = SparkSession.builder.config("spark.sql.warehouse.dir", "./spark-warehouse").appName("Test").master("local[*]").getOrCreate()
+  val session: SparkSession = SparkSession.builder
+    .config("spark.sql.warehouse.dir", "./spark-warehouse")
+    .appName("Test")
+    .master("local[*]")
+    .getOrCreate()
   val date = new java.util.Date
-  val df: DataFrame = session.createDataFrame(Seq(
-    ("Y1", 1000, Date.valueOf("2018-12-01"), new java.sql.Timestamp(date.getTime), java.math.BigDecimal.valueOf(0.19999)),
-    ("Y2", 200, null, new java.sql.Timestamp(date.getTime), java.math.BigDecimal.valueOf(19999.1))))
+  val df: DataFrame = session.createDataFrame(
+    Seq(
+      (
+        "Y1",
+        1000,
+        Date.valueOf("2018-12-01"),
+        new java.sql.Timestamp(date.getTime),
+        java.math.BigDecimal.valueOf(0.19999)
+      ),
+      ("Y2", 200, null, new java.sql.Timestamp(date.getTime), java.math.BigDecimal.valueOf(19999.1))
+    )
+  )
 
   override protected def beforeAll(): Unit = {
     session.sql("CREATE DATABASE IF NOT EXISTS query_test")
@@ -29,10 +42,13 @@ class QueryExecutorTest extends Matchers with FunSpecLike with BeforeAndAfterAll
 
   describe("Query Executor") {
     it("SQL Query inject") {
-      val testDF: DataFrame = session.createDataFrame(Seq(
-        ("Y1", 1000, "c", "james", "b", Some(0.2), 1L),
-        ("Y2", 200, "c", "james", "b", None, 1L),
-        ("Y3", 100, "b", "james", "b", None, 2L)))
+      val testDF: DataFrame = session.createDataFrame(
+        Seq(
+          ("Y1", 1000, "c", "james", "b", Some(0.2), 1L),
+          ("Y2", 200, "c", "james", "b", None, 1L),
+          ("Y3", 100, "b", "james", "b", None, 2L)
+        )
+      )
 
       val tempConfigString =
         """
